@@ -1,0 +1,8 @@
+{
+  "name": "art-by-karthik",           // Must match the Worker name in the dashboard
+  "compatibility_date": "2026-10-16",
+  "assets": {
+    "directory": "./dist",            // Vite's build output directory
+    "not_found_handling": "single-page-application"  // SPA routing — prevents 404 on refresh
+  }
+}
