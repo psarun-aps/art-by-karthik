@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Art by Karthik — Phase 1
 
 A minimalist, gallery-first React + TypeScript website for artbykarthik.com.
@@ -45,3 +46,7 @@ Phase 5: DNS configuration for Squarespace-registered domain, deployment, backup
 
 ## Privacy
 Do not publish Karthik's personal address, school, age, or direct contact details. Visitor messages should remain private until moderated.
+=======
+# art-by-karthik
+Website to display Karthik's artwork
+>>>>>>> 958f71fac5039383f616dabe39a915031c3e6d3d
