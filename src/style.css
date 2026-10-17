@@ -5,3 +5,5 @@
 @media(min-width:621px){.hero{padding-top:clamp(58px,7vw,88px);padding-bottom:68px}.hero h1{font-size:clamp(64px,8vw,112px);white-space:nowrap;line-height:1.04;letter-spacing:-4px;margin:20px 0 26px}}
 @media(min-width:621px) and (max-width:900px){.hero h1{font-size:clamp(60px,8.5vw,78px);letter-spacing:-3px}}
 @media(max-width:620px){.hero{padding-top:60px;padding-bottom:55px}.hero h1{white-space:normal;line-height:1.04;margin:18px 0 27px}}
+.work-section{border-top:1px solid #eceae6;padding-top:52px}.section-heading{margin-bottom:34px}
+@media(max-width:620px){.work-section{padding-top:38px}}
