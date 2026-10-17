@@ -10,3 +10,12 @@
 .section-heading h2{margin-top:10px}
 .work-section .art-image{background:#fff}
 @media(max-width:620px){.work-section{padding:38px max(6%,calc((100% - 1176px)/2)) 70px}.section-heading{padding-bottom:20px;margin-bottom:25px}.work-section .section-heading{flex-direction:column;align-items:stretch;gap:16px}.work-section .section-heading h2{font-size:clamp(36px,10vw,44px);white-space:nowrap}.work-section .section-heading .text-link{align-self:flex-end;margin-top:0}}
+.hero{padding-top:clamp(44px,5.5vw,68px);padding-bottom:50px}
+.hero-top{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.hero-top .eyebrow{margin:0}
+.hero-top .text-link{padding-bottom:8px}
+.hero h1{margin:18px 0 18px}
+.hero-bottom p{font-size:14px;white-space:nowrap}
+@media(min-width:621px){.hero h1{font-size:clamp(64px,8vw,112px);line-height:1.04}.hero-bottom p{font-size:15px}}
+@media(max-width:900px){.hero-bottom p{white-space:normal}}
+@media(max-width:620px){.hero{padding-top:40px;padding-bottom:38px}.hero-top{align-items:flex-start;gap:16px}.hero-top .eyebrow{font-size:8px;letter-spacing:1.5px}.hero-top .eyebrow-line{width:18px}.hero-top .text-link{font-size:8px;letter-spacing:1px;gap:7px;flex-shrink:0}.hero-top .text-link svg{width:13px;height:13px}.hero h1{font-size:clamp(32px,10.3vw,40px);letter-spacing:-2px;margin:25px 0 15px}.hero-bottom p{font-size:13px;line-height:1.7}}
