@@ -40,7 +40,7 @@ The gallery is now backed by a Cloudflare Worker, D1, and a private R2 bucket. U
 
 Create a Cloudflare Access self-hosted application for the site's hostname and protect both `/admin*` and `/api/admin*`. Its only allow policy should include `artistkarthik23@gmail.com` and `psarun27@gmail.com`. Use a one-time PIN or an identity provider with MFA. Restricting the site paths at Access prevents the admin page from being served to other visitors; the Worker also verifies the signed Access JWT, its audience, issuer, expiry, and email against the `ADMIN_EMAILS` allowlist before returning the page or accepting admin API requests.
 
-Update `ACCESS_TEAM_DOMAIN` and `ACCESS_AUD` in `wrangler.jsonc` with the Access team's domain (without `https://`) and the Access application's audience/tag. The Worker fails closed if these values remain placeholders. Keep the application in the same Access tenant as the configured team domain.
+`wrangler.jsonc` contains the Access team domain and application audience/tag. These are non-secret Worker settings and are included automatically on every `npm run deploy`; keep them set to the values for the same Access tenant and application. The Worker fails closed if either value is missing or left as a placeholder.
 
 ## Email delivery
 
@@ -62,7 +62,7 @@ Connect `artbykarthik.com` to the Cloudflare Worker as a custom domain, then dep
 npm run deploy
 ```
 
-The production site needs the D1 and R2 bindings in `wrangler.jsonc`, the Access values above, the two Worker secrets, and `VITE_TURNSTILE_SITE_KEY` available when Vite builds the static assets. If the domain's DNS is not already on Cloudflare, follow Cloudflare's custom-domain setup first.
+The production site needs the D1 and R2 bindings and Access settings in `wrangler.jsonc`, the two Worker secrets, and `VITE_TURNSTILE_SITE_KEY` available when Vite builds the static assets. If the domain's DNS is not already on Cloudflare, follow Cloudflare's custom-domain setup first.
 
 ## Local development
 
