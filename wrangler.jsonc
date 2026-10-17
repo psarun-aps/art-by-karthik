@@ -1,8 +1,31 @@
 {
-  "name": "art-by-karthik",           // Must match the Worker name in the dashboard
+  "name": "art-by-karthik",
+  "main": "src/worker.ts",
   "compatibility_date": "2026-10-16",
   "assets": {
-    "directory": "./dist",            // Vite's build output directory
-    "not_found_handling": "single-page-application"  // SPA routing — prevents 404 on refresh
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/media/*", "/admin*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "art-by-karthik",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "ARTWORKS",
+      "bucket_name": "art-by-karthik-artworks"
+    }
+  ],
+  "vars": {
+    "ADMIN_EMAILS": "artistkarthik23@gmail.com,psarun27@gmail.com",
+    "ACCESS_TEAM_DOMAIN": "REPLACE_WITH_CLOUDFLARE_ACCESS_TEAM_DOMAIN",
+    "ACCESS_AUD": "REPLACE_WITH_CLOUDFLARE_ACCESS_APPLICATION_AUD",
+    "RESEND_FROM_EMAIL": "Art by Karthik <artwork@artbykarthik.com>"
   }
 }

@@ -1,0 +1,6 @@
+ADMIN_EMAILS=artistkarthik23@gmail.com,psarun27@gmail.com
+ACCESS_TEAM_DOMAIN=your-team.cloudflareaccess.com
+ACCESS_AUD=your-cloudflare-access-application-audience
+RESEND_API_KEY=re_your_api_key
+RESEND_FROM_EMAIL=Art by Karthik <artwork@artbykarthik.com>
+TURNSTILE_SECRET_KEY=your-turnstile-secret
