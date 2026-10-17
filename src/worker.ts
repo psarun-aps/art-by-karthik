@@ -241,7 +241,8 @@ async function getArtworks(env: Env): Promise<Response> {
   const result = await env.DB.prepare(
     `SELECT a.id, a.title, a.category, a.year, a.image, a.description,
       (SELECT COUNT(*) FROM reactions r WHERE r.artwork_id = a.id AND r.reaction = 'like') AS likes,
-      (SELECT COUNT(*) FROM reactions r WHERE r.artwork_id = a.id AND r.reaction = 'heart') AS hearts
+      (SELECT COUNT(*) FROM reactions r WHERE r.artwork_id = a.id AND r.reaction = 'heart') AS hearts,
+      (SELECT COUNT(*) FROM comments c WHERE c.artwork_id = a.id AND c.status = 'approved') AS comments
      FROM artworks a ORDER BY a.created_at DESC, a.id`,
   ).all();
   return json({ artworks: result.results || [] });

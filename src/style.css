@@ -19,3 +19,10 @@
 @media(min-width:621px){.hero h1{font-size:clamp(64px,8vw,112px);line-height:1.04}.hero-bottom p{font-size:15px}}
 @media(max-width:900px){.hero-bottom p{white-space:normal}}
 @media(max-width:620px){.hero{padding-top:40px;padding-bottom:38px}.hero-top{align-items:flex-start;gap:16px}.hero-top .eyebrow{font-size:8px;letter-spacing:1.5px}.hero-top .eyebrow-line{width:18px}.hero-top .text-link{font-size:8px;letter-spacing:1px;gap:7px;flex-shrink:0}.hero-top .text-link svg{width:13px;height:13px}.hero h1{font-size:clamp(32px,10.3vw,40px);letter-spacing:-2px;margin:25px 0 15px}.hero-bottom p{font-size:13px;line-height:1.7}}
+.art-engagement{display:flex;align-items:center;gap:10px;min-height:38px;margin-top:9px}
+.art-engagement .reaction-area{margin-top:0}
+.comment-count{display:inline-flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid #e5e2de;color:#777;font-size:11px}
+.comment-count:hover,.comment-count:focus-visible{color:#a05f59;border-color:#d8bcb6}
+.comment-count:focus-visible{outline:2px solid #a5835e;outline-offset:2px}
+.approved-comments{margin:24px 0 36px}
+.comments-section:target{scroll-margin-top:24px}

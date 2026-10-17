@@ -1,12 +1,12 @@
 import React, {createContext, useContext, useEffect, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {BrowserRouter,Link,NavLink,Route,Routes,useParams} from 'react-router-dom';
-import {ArrowUpRight,ArrowLeft,Menu,X,ChevronLeft,ChevronRight,ZoomIn,ZoomOut,RotateCcw,ThumbsUp,Heart,Upload,Check,Trash2} from 'lucide-react';
+import {ArrowUpRight,ArrowLeft,Menu,X,ChevronLeft,ChevronRight,ZoomIn,ZoomOut,RotateCcw,ThumbsUp,Heart,MessageCircle,Upload,Check,Trash2} from 'lucide-react';
 import {artworks as starterArtworks,categories as starterCategories,Artwork} from './data';
 import {apiRequest,ApiError,turnstileSiteKey} from './api';
 import './style.css';
 
-type GalleryArtwork = Artwork & {likes:number;hearts:number};
+type GalleryArtwork = Artwork & {likes:number;hearts:number;comments:number};
 type Comment = {id:string;name:string;message:string;createdAt:string;artworkTitle?:string};
 type GalleryState = {
   artworks:GalleryArtwork[];
@@ -17,7 +17,7 @@ type GalleryState = {
 };
 
 const GalleryContext=createContext<GalleryState>({
-  artworks:starterArtworks.map(art=>({...art,likes:0,hearts:0})),
+  artworks:starterArtworks.map(art=>({...art,likes:0,hearts:0,comments:0})),
   categories:starterCategories.filter(category=>category!=='All Works'),
   error:'',
   updateArtwork:()=>{},
@@ -25,7 +25,7 @@ const GalleryContext=createContext<GalleryState>({
 });
 
 function GalleryProvider({children}:{children:React.ReactNode}){
-  const [artworks,setArtworks]=useState<GalleryArtwork[]>(starterArtworks.map(art=>({...art,likes:0,hearts:0})));
+  const [artworks,setArtworks]=useState<GalleryArtwork[]>(starterArtworks.map(art=>({...art,likes:0,hearts:0,comments:0})));
   const [categories,setCategories]=useState<string[]>(starterCategories.filter(category=>category!=='All Works'));
   const [error,setError]=useState('');
   const refresh=async()=>{
@@ -116,7 +116,7 @@ function ReactionButtons({art}:{art:GalleryArtwork}){
 }
 
 function ArtCard({art}:{art:GalleryArtwork}){
-  return <article className="art-card"><Link className="art-image" to={'/artwork/'+art.id}><img src={art.image} alt={'Artwork: '+art.title} loading="lazy"/><span className="art-view">VIEW ARTWORK <ArrowUpRight size={14}/></span></Link><Link className="art-meta" to={'/artwork/'+art.id}><div><h3>{art.title}</h3><span>{art.category}</span></div><span>{art.year}</span></Link><ReactionButtons art={art}/></article>;
+  return <article className="art-card"><Link className="art-image" to={'/artwork/'+art.id}><img src={art.image} alt={'Artwork: '+art.title} loading="lazy"/><span className="art-view">VIEW ARTWORK <ArrowUpRight size={14}/></span></Link><Link className="art-meta" to={'/artwork/'+art.id}><div><h3>{art.title}</h3><span>{art.category}</span></div><span>{art.year}</span></Link><div className="art-engagement"><ReactionButtons art={art}/><Link className="comment-count" to={`/artwork/${art.id}#comments`} aria-label={`${art.comments} comments on ${art.title}`} title={`${art.comments} comments`}><MessageCircle size={16}/><span>{art.comments}</span></Link></div></article>;
 }
 
 function Home(){
@@ -224,7 +224,7 @@ function CommentSection({art}:{art:GalleryArtwork}){
     }catch(error){setStatus(error instanceof Error?error.message:'Could not send your comment.')}
     finally{setToken('');setChallengeVersion(current=>current+1);setSending(false)}
   };
-  return <section className="comments-section"><div className="section-heading"><div><p className="eyebrow">A NOTE FOR THIS DRAWING</p><h2>Comments<span className="accent">.</span></h2></div></div><p className="small-note">Comments are reviewed before they appear publicly.</p><form className="comment-form" onSubmit={submit}><label htmlFor="comment-name">YOUR NAME</label><input id="comment-name" value={name} onChange={event=>setName(event.target.value)} required maxLength={80} placeholder="Your name"/><label htmlFor="comment-message">YOUR COMMENT</label><textarea id="comment-message" value={message} onChange={event=>setMessage(event.target.value)} required maxLength={1000} rows={4} placeholder="Write a kind note..."/><TurnstileWidget key={challengeVersion} onToken={setToken}/><button className="solid-button" type="submit" disabled={sending||!token}>{sending?'SENDING...':'SUBMIT FOR APPROVAL'} <ArrowUpRight size={16}/></button>{status&&<p className="form-status" role="status">{status}</p>}</form><div className="approved-comments" aria-live="polite">{comments.map(comment=><article key={comment.id}><h3>{comment.name}</h3><p>{comment.message}</p><time>{new Date(comment.createdAt).toLocaleDateString()}</time></article>)}{comments.length===0&&<p className="small-note">No approved comments yet. Leave the first kind note.</p>}</div></section>;
+  return <section className="comments-section" id="comments"><div className="section-heading"><div><p className="eyebrow">A NOTE FOR THIS DRAWING</p><h2>Comments<span className="accent">.</span></h2></div></div><p className="small-note">Comments are reviewed before they appear publicly.</p><div className="approved-comments" aria-live="polite">{comments.map(comment=><article key={comment.id}><h3>{comment.name}</h3><p>{comment.message}</p><time>{new Date(comment.createdAt).toLocaleDateString()}</time></article>)}{comments.length===0&&<p className="small-note">No approved comments yet. Leave the first kind note.</p>}</div><form className="comment-form" onSubmit={submit}><label htmlFor="comment-name">YOUR NAME</label><input id="comment-name" value={name} onChange={event=>setName(event.target.value)} required maxLength={80} placeholder="Your name"/><label htmlFor="comment-message">YOUR COMMENT</label><textarea id="comment-message" value={message} onChange={event=>setMessage(event.target.value)} required maxLength={1000} rows={4} placeholder="Write a kind note..."/><TurnstileWidget key={challengeVersion} onToken={setToken}/><button className="solid-button" type="submit" disabled={sending||!token}>{sending?'SENDING...':'SUBMIT FOR APPROVAL'} <ArrowUpRight size={16}/></button>{status&&<p className="form-status" role="status">{status}</p>}</form></section>;
 }
 
 function ArtworkDetail(){
@@ -232,7 +232,14 @@ function ArtworkDetail(){
   const {artworks}=useGallery();
   const art=artworks.find(item=>item.id===id);
   const [zoom,setZoom]=useState(1);
-  useEffect(()=>{window.scrollTo(0,0);setZoom(1)},[id]);
+  useEffect(()=>{
+    setZoom(1);
+    if(window.location.hash==='#comments'){
+      requestAnimationFrame(()=>document.getElementById('comments')?.scrollIntoView({behavior:'smooth'}));
+    }else{
+      window.scrollTo(0,0);
+    }
+  },[id]);
   if(!art)return <main className="inner-page"><h1>Artwork not found.</h1><Link to="/gallery">Back to gallery</Link></main>;
   const index=artworks.indexOf(art);
   return <main className="inner-page detail-page"><Link className="back-link" to="/gallery"><ArrowLeft size={16}/> BACK TO GALLERY</Link><div className="detail-layout"><div className="detail-image"><button className="detail-zoom-trigger" type="button" aria-label={zoom===1?'Zoom in on artwork':'Reset artwork zoom'} onClick={()=>setZoom(current=>current===1?2:1)}><img src={art.image} alt={'Artwork: '+art.title} style={{transform:`scale(${zoom})`}}/></button><div className="detail-zoom-controls" aria-label="Artwork zoom controls"><button type="button" aria-label="Zoom out" title="Zoom out" disabled={zoom<=1} onClick={()=>setZoom(current=>Math.max(1,current-0.25))}><ZoomOut size={17}/></button><span aria-live="polite">{Math.round(zoom*100)}%</span><button type="button" aria-label="Zoom in" title="Zoom in" disabled={zoom>=3} onClick={()=>setZoom(current=>Math.min(3,current+0.25))}><ZoomIn size={17}/></button><button type="button" aria-label="Reset zoom" title="Reset zoom" disabled={zoom===1} onClick={()=>setZoom(1)}><RotateCcw size={15}/></button></div></div><div className="detail-info"><p className="eyebrow">ARTWORK NO. {art.id}</p><h1>{art.title}<span className="accent">.</span></h1><p>{art.description}</p><dl><div><dt>MEDIUM</dt><dd>Pen drawing</dd></div><div><dt>CATEGORY</dt><dd>{art.category}</dd></div><div><dt>YEAR</dt><dd>{art.year}</dd></div></dl><ReactionButtons art={art}/><div className="detail-controls"><Link aria-label="Previous artwork" to={'/artwork/'+artworks[(index-1+artworks.length)%artworks.length].id}><ChevronLeft/></Link><span>{index+1} / {artworks.length}</span><Link aria-label="Next artwork" to={'/artwork/'+artworks[(index+1)%artworks.length].id}><ChevronRight/></Link></div></div></div><CommentSection art={art}/></main>;
