@@ -346,7 +346,7 @@ async function uploadArtwork(request: Request, env: Env): Promise<Response> {
       .bind(category).run();
     await env.DB.prepare(
       'INSERT INTO artworks (id, title, category, year, image, description) VALUES (?, ?, ?, ?, ?, ?)',
-    ).bind(id, title, category, String(new Date().getFullYear()), `/media/${key}`, description).run();
+    ).bind(id, title, category, String(new Date().getFullYear()), `/media/${key}?watermarked=1`, description).run();
   } catch (error) {
     try {
       await env.ARTWORKS.delete(key);

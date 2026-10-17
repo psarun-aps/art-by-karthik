@@ -8,6 +8,8 @@ import './style.css';
 
 type GalleryArtwork = Artwork & {likes:number;hearts:number;comments:number};
 type Comment = {id:string;name:string;message:string;createdAt:string;artworkTitle?:string};
+const watermarkText='Karthik Arun ©';
+function hasBakedWatermark(image:string){return image.includes('watermarked=1')}
 type GalleryState = {
   artworks:GalleryArtwork[];
   categories:string[];
@@ -116,7 +118,8 @@ function ReactionButtons({art}:{art:GalleryArtwork}){
 }
 
 function ArtCard({art}:{art:GalleryArtwork}){
-  return <article className="art-card"><Link className="art-image" to={'/artwork/'+art.id}><img src={art.image} alt={'Artwork: '+art.title} loading="lazy"/><span className="art-view">VIEW ARTWORK <ArrowUpRight size={14}/></span></Link><Link className="art-meta" to={'/artwork/'+art.id}><div><h3>{art.title}</h3><span>{art.category}</span></div><span>{art.year}</span></Link><div className="art-engagement"><ReactionButtons art={art}/><Link className="comment-count" to={`/artwork/${art.id}#comments`} aria-label={`${art.comments} comments on ${art.title}`} title={`${art.comments} comments`}><MessageCircle size={16}/><span>{art.comments}</span></Link></div></article>;
+  const imageClass=hasBakedWatermark(art.image)?'art-image watermark-baked':'art-image';
+  return <article className="art-card"><Link className={imageClass} to={'/artwork/'+art.id}><img src={art.image} alt={'Artwork: '+art.title} loading="lazy" draggable={false}/><span className="art-view">VIEW ARTWORK <ArrowUpRight size={14}/></span></Link><Link className="art-meta" to={'/artwork/'+art.id}><div><h3>{art.title}</h3><span>{art.category}</span></div><span>{art.year}</span></Link><div className="art-engagement"><ReactionButtons art={art}/><Link className="comment-count" to={`/artwork/${art.id}#comments`} aria-label={`${art.comments} comments on ${art.title}`} title={`${art.comments} comments`}><MessageCircle size={16}/><span>{art.comments}</span></Link></div></article>;
 }
 
 function Home(){
@@ -131,7 +134,7 @@ function Gallery(){
   return <main className="inner-page"><p className="eyebrow">01 / EXPLORE THE COLLECTION</p><h1 className="page-title">The gallery<span className="accent">.</span></h1><p className="page-intro">A growing collection of original pen drawings, shaped by curiosity and imagination.</p><div className="filters" aria-label="Filter artwork by category">{['All Works',...categories].map(category=><button className={filter===category?'selected':''} key={category} onClick={()=>setFilter(category)}>{category}</button>)}</div><div className="gallery-grid">{filtered.map(art=><ArtCard key={art.id} art={art}/>)}</div>{!filtered.length&&<p>No artwork in this category yet.</p>}</main>;
 }
 
-function About(){return <main className="inner-page about-page"><p className="eyebrow">02 / BEHIND THE LINES</p><h1 className="page-title">Meet Karthik Arun<span className="accent">.</span></h1><div className="about-grid"><div className="about-visual"><img src="/Karthik%20Arun.JPG" alt="Karthik Arun"/></div><div className="about-copy"><span className="eyebrow">THE ARTIST & HIS IMAGINATION</span><h2>A world drawn<br/>one line at a time.</h2><p>Karthik Arun is a young artist whose imagination finds its way onto paper through drawing. He began drawing at the age of four, and art remains an important way for him to communicate and explore the world around him. He lives in Cary, North Carolina with his family and loves spending time with them. His brother, Arya, is his best friend.</p><p>His subjects and interests change over time, inspired by films, Indian culture, Hindu deities, comic characters, monuments, geography, and the wider world, including its countries, flags, and aircraft. Working on small pieces of paper with a black ballpoint pen, Karthik usually draws from memory, capturing what he sees in a single, quick sitting. His expressive line work turns simple strokes into thoughtful forms.</p><Link to="/gallery" className="text-link">EXPLORE HIS WORK <ArrowUpRight size={17}/></Link></div></div></main>}
+function About(){return <main className="inner-page about-page"><p className="eyebrow">02 / BEHIND THE LINES</p><h1 className="page-title">Meet Karthik Arun<span className="accent">.</span></h1><div className="about-grid"><div className="about-visual"><img src="/Karthik%20Arun.JPG" alt="Karthik Arun" draggable={false}/></div><div className="about-copy"><span className="eyebrow">THE ARTIST & HIS IMAGINATION</span><h2>A world drawn<br/>one line at a time.</h2><p>Karthik Arun is a young artist whose imagination finds its way onto paper through drawing. He began drawing at the age of four, and art remains an important way for him to communicate and explore the world around him. He lives in Cary, North Carolina with his family and loves spending time with them. His brother, Arya, is his best friend.</p><p>His subjects and interests change over time, inspired by films, Indian culture, Hindu deities, comic characters, monuments, geography, and the wider world, including its countries, flags, and aircraft. Working on small pieces of paper with a black ballpoint pen, Karthik usually draws from memory, capturing what he sees in a single, quick sitting. His expressive line work turns simple strokes into thoughtful forms.</p><Link to="/gallery" className="text-link">EXPLORE HIS WORK <ArrowUpRight size={17}/></Link></div></div></main>}
 
 type TurnstileApi={render:(element:HTMLElement,options:{sitekey:string;callback:(token:string)=>void;'expired-callback':()=>void;'error-callback':()=>void})=>string;remove:(id:string)=>void};
 declare global{interface Window{turnstile?:TurnstileApi}}
@@ -201,6 +204,40 @@ function Feedback(){
   return <main className="inner-page feedback-page"><p className="eyebrow">03 / LEAVE A NOTE</p><h1 className="page-title">Say hello<span className="accent">.</span></h1><p className="page-intro">Enjoyed a drawing? We'd love to hear what you think. Your encouragement means a lot.</p><div className="feedback-shell"><div><h2>Kind words inspire<br/>new creations.</h2><p>Share your thoughts, favorite artwork, or a little encouragement for the artist.</p><p className="small-note">Your message will be sent privately to the artist.</p></div><form onSubmit={submit}><label htmlFor="visitor">YOUR NAME</label><input id="visitor" value={name} onChange={event=>setName(event.target.value)} placeholder="Your name" required maxLength={80}/><label htmlFor="message">YOUR MESSAGE</label><textarea id="message" value={message} onChange={event=>setMessage(event.target.value)} rows={5} placeholder="Write a kind note..." required maxLength={2000}/><TurnstileWidget key={challengeVersion} onToken={setToken}/><button className="solid-button" type="submit" disabled={sending||!token}>{sending?'SENDING...':'SEND A MESSAGE'} <ArrowUpRight size={16}/></button>{status&&<p className="form-status" role="status">{status}</p>}</form></div></main>;
 }
 
+async function addWatermark(file:File):Promise<File>{
+  const bitmap=await createImageBitmap(file);
+  try{
+    const canvas=document.createElement('canvas');
+    canvas.width=bitmap.width;
+    canvas.height=bitmap.height;
+    const context=canvas.getContext('2d');
+    if(!context)throw new Error('Could not prepare the image for watermarking.');
+    context.drawImage(bitmap,0,0);
+    const fontSize=Math.max(14,Math.min(bitmap.width,bitmap.height)*0.022);
+    const margin=fontSize*1.2;
+    context.save();
+    context.font=`italic 600 ${fontSize}px Georgia, serif`;
+    context.textAlign='right';
+    context.textBaseline='bottom';
+    context.fillStyle='rgba(255,255,255,0.84)';
+    context.shadowColor='rgba(0,0,0,0.72)';
+    context.shadowBlur=fontSize*0.3;
+    context.shadowOffsetX=1;
+    context.shadowOffsetY=1;
+    context.fillText(watermarkText,bitmap.width-margin,bitmap.height-margin);
+    context.restore();
+    const blob=await new Promise<Blob>((resolve,reject)=>{
+      canvas.toBlob(result=>{
+        if(result)resolve(result);
+        else reject(new Error('Could not create the watermarked image.'));
+      },file.type,file.type==='image/jpeg'||file.type==='image/webp'?0.95:undefined);
+    });
+    return new File([blob],file.name,{type:blob.type,lastModified:Date.now()});
+  }finally{
+    bitmap.close();
+  }
+}
+
 function CommentSection({art}:{art:GalleryArtwork}){
   const [comments,setComments]=useState<Comment[]>([]);
   const [name,setName]=useState('');
@@ -242,7 +279,8 @@ function ArtworkDetail(){
   },[id]);
   if(!art)return <main className="inner-page"><h1>Artwork not found.</h1><Link to="/gallery">Back to gallery</Link></main>;
   const index=artworks.indexOf(art);
-  return <main className="inner-page detail-page"><Link className="back-link" to="/gallery"><ArrowLeft size={16}/> BACK TO GALLERY</Link><div className="detail-layout"><div className="detail-image"><button className="detail-zoom-trigger" type="button" aria-label={zoom===1?'Zoom in on artwork':'Reset artwork zoom'} onClick={()=>setZoom(current=>current===1?2:1)}><img src={art.image} alt={'Artwork: '+art.title} style={{transform:`scale(${zoom})`}}/></button><div className="detail-zoom-controls" aria-label="Artwork zoom controls"><button type="button" aria-label="Zoom out" title="Zoom out" disabled={zoom<=1} onClick={()=>setZoom(current=>Math.max(1,current-0.25))}><ZoomOut size={17}/></button><span aria-live="polite">{Math.round(zoom*100)}%</span><button type="button" aria-label="Zoom in" title="Zoom in" disabled={zoom>=3} onClick={()=>setZoom(current=>Math.min(3,current+0.25))}><ZoomIn size={17}/></button><button type="button" aria-label="Reset zoom" title="Reset zoom" disabled={zoom===1} onClick={()=>setZoom(1)}><RotateCcw size={15}/></button></div></div><div className="detail-info"><p className="eyebrow">ARTWORK NO. {art.id}</p><h1>{art.title}<span className="accent">.</span></h1><p>{art.description}</p><dl><div><dt>MEDIUM</dt><dd>Pen drawing</dd></div><div><dt>CATEGORY</dt><dd>{art.category}</dd></div><div><dt>YEAR</dt><dd>{art.year}</dd></div></dl><ReactionButtons art={art}/><div className="detail-controls"><Link aria-label="Previous artwork" to={'/artwork/'+artworks[(index-1+artworks.length)%artworks.length].id}><ChevronLeft/></Link><span>{index+1} / {artworks.length}</span><Link aria-label="Next artwork" to={'/artwork/'+artworks[(index+1)%artworks.length].id}><ChevronRight/></Link></div></div></div><CommentSection art={art}/></main>;
+  const imageClass=hasBakedWatermark(art.image)?'detail-image watermark-baked':'detail-image';
+  return <main className="inner-page detail-page"><Link className="back-link" to="/gallery"><ArrowLeft size={16}/> BACK TO GALLERY</Link><div className="detail-layout"><div className={imageClass}><button className="detail-zoom-trigger" type="button" aria-label={zoom===1?'Zoom in on artwork':'Reset artwork zoom'} onClick={()=>setZoom(current=>current===1?2:1)}><img src={art.image} alt={'Artwork: '+art.title} style={{transform:`scale(${zoom})`}} draggable={false}/></button><div className="detail-zoom-controls" aria-label="Artwork zoom controls"><button type="button" aria-label="Zoom out" title="Zoom out" disabled={zoom<=1} onClick={()=>setZoom(current=>Math.max(1,current-0.25))}><ZoomOut size={17}/></button><span aria-live="polite">{Math.round(zoom*100)}%</span><button type="button" aria-label="Zoom in" title="Zoom in" disabled={zoom>=3} onClick={()=>setZoom(current=>Math.min(3,current+0.25))}><ZoomIn size={17}/></button><button type="button" aria-label="Reset zoom" title="Reset zoom" disabled={zoom===1} onClick={()=>setZoom(1)}><RotateCcw size={15}/></button></div></div><div className="detail-info"><p className="eyebrow">ARTWORK NO. {art.id}</p><h1>{art.title}<span className="accent">.</span></h1><p>{art.description}</p><dl><div><dt>MEDIUM</dt><dd>Pen drawing</dd></div><div><dt>CATEGORY</dt><dd>{art.category}</dd></div><div><dt>YEAR</dt><dd>{art.year}</dd></div></dl><ReactionButtons art={art}/><div className="detail-controls"><Link aria-label="Previous artwork" to={'/artwork/'+artworks[(index-1+artworks.length)%artworks.length].id}><ChevronLeft/></Link><span>{index+1} / {artworks.length}</span><Link aria-label="Next artwork" to={'/artwork/'+artworks[(index+1)%artworks.length].id}><ChevronRight/></Link></div></div></div><CommentSection art={art}/></main>;
 }
 
 function Admin(){
@@ -274,10 +312,13 @@ function Admin(){
   const upload=async(event:React.FormEvent<HTMLFormElement>)=>{
     event.preventDefault();setBusy(true);setStatus('');
     if(!file){setStatus('Choose an image to upload.');setBusy(false);return}
-    const form=new FormData();
-    form.set('image',file);form.set('filename',filename);form.set('title',title);
-    form.set('category',newCategory.trim()||category);form.set('description',description);
     try{
+      setStatus('Adding the Karthik Arun watermark...');
+      const watermarkedFile=await addWatermark(file);
+      if(watermarkedFile.size>15*1024*1024)throw new Error('The watermarked image exceeds 15 MB. Choose a smaller image.');
+      const form=new FormData();
+      form.set('image',watermarkedFile);form.set('filename',filename);form.set('title',title);
+      form.set('category',newCategory.trim()||category);form.set('description',description);
       await apiRequest('/api/admin/artworks',{method:'POST',body:form});
       void refresh();
       setFilename('');setTitle('');setDescription('');setNewCategory('');setFile(null);
@@ -298,12 +339,15 @@ function Admin(){
   };
   if(!checked)return <main className="inner-page"><p>Checking admin access...</p></main>;
   if(!authorized)return <main className="inner-page"><h1>Admin access required.</h1><p className="page-intro">{status||'Sign in with the authorized Cloudflare Access account to continue.'}</p></main>;
-  return <main className="inner-page admin-page"><p className="eyebrow">PRIVATE / ARTIST TOOLS</p><h1 className="page-title">Admin<span className="accent">.</span></h1>{status&&<p className="form-status" role="status">{status}</p>}<section className="admin-section"><h2>Upload a drawing</h2><form className="admin-form" onSubmit={upload}><label htmlFor="artwork-file">IMAGE (JPEG, PNG OR WEBP; MAX 15 MB)</label><input id="artwork-file" type="file" accept="image/jpeg,image/png,image/webp" required onChange={event=>{const selected=event.target.files?.[0]||null;setFile(selected);if(selected&&!filename)setFilename(selected.name.replace(/\.[^.]+$/,''))}}/><label htmlFor="file-name">FILE NAME</label><input id="file-name" value={filename} onChange={event=>setFilename(event.target.value)} required maxLength={80} placeholder="e.g. blue-bird"/><label htmlFor="artwork-title">ARTWORK TITLE</label><input id="artwork-title" value={title} onChange={event=>setTitle(event.target.value)} required maxLength={120} placeholder="The title shown in the gallery"/><label htmlFor="artwork-category">CATEGORY</label><select id="artwork-category" value={category} onChange={event=>setCategory(event.target.value)}>{categories.map(item=><option key={item} value={item}>{item}</option>)}</select><label htmlFor="new-category">OR CREATE A CATEGORY</label><input id="new-category" value={newCategory} onChange={event=>setNewCategory(event.target.value)} maxLength={60} placeholder="Leave blank to use the selected category"/><label htmlFor="artwork-description">DESCRIPTION (OPTIONAL)</label><textarea id="artwork-description" value={description} onChange={event=>setDescription(event.target.value)} maxLength={500} rows={3}/><button className="solid-button" type="submit" disabled={busy}>{busy?'UPLOADING...':'UPLOAD ARTWORK'} <Upload size={16}/></button></form></section><section className="admin-section"><h2>Comments awaiting approval <span className="accent">({pending.length})</span></h2>{pending.length===0&&<p className="small-note">No comments are waiting for approval.</p>}{pending.map(comment=><article className="moderation-card" key={comment.id}><p className="eyebrow">{comment.artworkTitle}</p><h3>{comment.name}</h3><p>{comment.message}</p><div><button type="button" className="approve-button" onClick={()=>void moderate(comment.id,'approved')}><Check size={16}/> APPROVE</button><button type="button" className="reject-button" onClick={()=>void moderate(comment.id,'rejected')}><Trash2 size={16}/> REJECT</button></div></article>)}</section><section className="admin-section"><h2>Gallery artworks <span className="accent">({artworks.length})</span></h2><ul className="admin-artwork-list">{artworks.map(art=><li key={art.id}>{art.title}<span>{art.category}</span></li>)}</ul></section></main>;
+  return <main className="inner-page admin-page"><p className="eyebrow">PRIVATE / ARTIST TOOLS</p><h1 className="page-title">Admin<span className="accent">.</span></h1>{status&&<p className="form-status" role="status">{status}</p>}<section className="admin-section"><h2>Upload a drawing</h2><form className="admin-form" onSubmit={upload}><label htmlFor="artwork-file">IMAGE (JPEG, PNG OR WEBP; MAX 15 MB)</label><input id="artwork-file" type="file" accept="image/jpeg,image/png,image/webp" required onChange={event=>{const selected=event.target.files?.[0]||null;setFile(selected);if(selected&&!filename)setFilename(selected.name.replace(/\.[^.]+$/,''))}}/><p className="small-note">A subtle “Karthik Arun ©” signature is added automatically at the bottom-right.</p><label htmlFor="file-name">FILE NAME</label><input id="file-name" value={filename} onChange={event=>setFilename(event.target.value)} required maxLength={80} placeholder="e.g. blue-bird"/><label htmlFor="artwork-title">ARTWORK TITLE</label><input id="artwork-title" value={title} onChange={event=>setTitle(event.target.value)} required maxLength={120} placeholder="The title shown in the gallery"/><label htmlFor="artwork-category">CATEGORY</label><select id="artwork-category" value={category} onChange={event=>setCategory(event.target.value)}>{categories.map(item=><option key={item} value={item}>{item}</option>)}</select><label htmlFor="new-category">OR CREATE A CATEGORY</label><input id="new-category" value={newCategory} onChange={event=>setNewCategory(event.target.value)} maxLength={60} placeholder="Leave blank to use the selected category"/><label htmlFor="artwork-description">DESCRIPTION (OPTIONAL)</label><textarea id="artwork-description" value={description} onChange={event=>setDescription(event.target.value)} maxLength={500} rows={3}/><button className="solid-button" type="submit" disabled={busy}>{busy?'UPLOADING...':'UPLOAD ARTWORK'} <Upload size={16}/></button></form></section><section className="admin-section"><h2>Comments awaiting approval <span className="accent">({pending.length})</span></h2>{pending.length===0&&<p className="small-note">No comments are waiting for approval.</p>}{pending.map(comment=><article className="moderation-card" key={comment.id}><p className="eyebrow">{comment.artworkTitle}</p><h3>{comment.name}</h3><p>{comment.message}</p><div><button type="button" className="approve-button" onClick={()=>void moderate(comment.id,'approved')}><Check size={16}/> APPROVE</button><button type="button" className="reject-button" onClick={()=>void moderate(comment.id,'rejected')}><Trash2 size={16}/> REJECT</button></div></article>)}</section><section className="admin-section"><h2>Gallery artworks <span className="accent">({artworks.length})</span></h2><ul className="admin-artwork-list">{artworks.map(art=><li key={art.id}>{art.title}<span>{art.category}</span></li>)}</ul></section></main>;
 }
 
 function App(){
   const {error}=useGallery();
-  return <BrowserRouter><Header/>{error&&<div className="api-notice" role="status">Live gallery data is unavailable: {error}</div>}<Routes><Route path="/" element={<Home/>}/><Route path="/gallery" element={<Gallery/>}/><Route path="/about" element={<About/>}/><Route path="/feedback" element={<Feedback/>}/><Route path="/artwork/:id" element={<ArtworkDetail/>}/><Route path="/admin" element={<Admin/>}/><Route path="*" element={<main className="inner-page"><h1>Page not found.</h1><Link to="/">Back home</Link></main>}/></Routes><Footer/></BrowserRouter>;
+  const protectImage=(event:React.MouseEvent<HTMLDivElement>)=>{
+    if(event.target instanceof Element&&event.target.closest('img, .art-image, .detail-image, .about-visual'))event.preventDefault();
+  };
+  return <BrowserRouter><div className="site-shell" onContextMenu={protectImage} onDragStart={protectImage}><Header/>{error&&<div className="api-notice" role="status">Live gallery data is unavailable: {error}</div>}<Routes><Route path="/" element={<Home/>}/><Route path="/gallery" element={<Gallery/>}/><Route path="/about" element={<About/>}/><Route path="/feedback" element={<Feedback/>}/><Route path="/artwork/:id" element={<ArtworkDetail/>}/><Route path="/admin" element={<Admin/>}/><Route path="*" element={<main className="inner-page"><h1>Page not found.</h1><Link to="/">Back home</Link></main>}/></Routes><Footer/></div></BrowserRouter>;
 }
 
 createRoot(document.getElementById('root')!).render(<React.StrictMode><GalleryProvider><App/></GalleryProvider></React.StrictMode>);
