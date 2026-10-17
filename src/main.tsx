@@ -8,7 +8,7 @@ import './style.css';
 
 type GalleryArtwork = Artwork & {likes:number;hearts:number;comments:number};
 type Comment = {id:string;name:string;message:string;createdAt:string;artworkTitle?:string};
-const watermarkText='Karthik Arun ©';
+const watermarkText='Karthik';
 function hasBakedWatermark(image:string){return image.includes('watermarked=1')}
 type GalleryState = {
   artworks:GalleryArtwork[];
@@ -214,17 +214,14 @@ async function addWatermark(file:File):Promise<File>{
     if(!context)throw new Error('Could not prepare the image for watermarking.');
     context.drawImage(bitmap,0,0);
     const fontSize=Math.max(14,Math.min(bitmap.width,bitmap.height)*0.022);
-    const margin=fontSize*1.2;
     context.save();
     context.font=`italic 600 ${fontSize}px Georgia, serif`;
-    context.textAlign='right';
-    context.textBaseline='bottom';
-    context.fillStyle='rgba(255,255,255,0.84)';
-    context.shadowColor='rgba(0,0,0,0.72)';
-    context.shadowBlur=fontSize*0.3;
-    context.shadowOffsetX=1;
-    context.shadowOffsetY=1;
-    context.fillText(watermarkText,bitmap.width-margin,bitmap.height-margin);
+    context.textAlign='center';
+    context.textBaseline='middle';
+    context.fillStyle='rgba(255,255,255,0.52)';
+    context.shadowColor='rgba(0,0,0,0.52)';
+    context.shadowBlur=fontSize*0.24;
+    context.fillText(watermarkText,bitmap.width/2,bitmap.height/2);
     context.restore();
     const blob=await new Promise<Blob>((resolve,reject)=>{
       canvas.toBlob(result=>{
@@ -313,7 +310,7 @@ function Admin(){
     event.preventDefault();setBusy(true);setStatus('');
     if(!file){setStatus('Choose an image to upload.');setBusy(false);return}
     try{
-      setStatus('Adding the Karthik Arun watermark...');
+      setStatus('Adding the Karthik watermark...');
       const watermarkedFile=await addWatermark(file);
       if(watermarkedFile.size>15*1024*1024)throw new Error('The watermarked image exceeds 15 MB. Choose a smaller image.');
       const form=new FormData();
@@ -339,7 +336,7 @@ function Admin(){
   };
   if(!checked)return <main className="inner-page"><p>Checking admin access...</p></main>;
   if(!authorized)return <main className="inner-page"><h1>Admin access required.</h1><p className="page-intro">{status||'Sign in with the authorized Cloudflare Access account to continue.'}</p></main>;
-  return <main className="inner-page admin-page"><p className="eyebrow">PRIVATE / ARTIST TOOLS</p><h1 className="page-title">Admin<span className="accent">.</span></h1>{status&&<p className="form-status" role="status">{status}</p>}<section className="admin-section"><h2>Upload a drawing</h2><form className="admin-form" onSubmit={upload}><label htmlFor="artwork-file">IMAGE (JPEG, PNG OR WEBP; MAX 15 MB)</label><input id="artwork-file" type="file" accept="image/jpeg,image/png,image/webp" required onChange={event=>{const selected=event.target.files?.[0]||null;setFile(selected);if(selected&&!filename)setFilename(selected.name.replace(/\.[^.]+$/,''))}}/><p className="small-note">A subtle “Karthik Arun ©” signature is added automatically at the bottom-right.</p><label htmlFor="file-name">FILE NAME</label><input id="file-name" value={filename} onChange={event=>setFilename(event.target.value)} required maxLength={80} placeholder="e.g. blue-bird"/><label htmlFor="artwork-title">ARTWORK TITLE</label><input id="artwork-title" value={title} onChange={event=>setTitle(event.target.value)} required maxLength={120} placeholder="The title shown in the gallery"/><label htmlFor="artwork-category">CATEGORY</label><select id="artwork-category" value={category} onChange={event=>setCategory(event.target.value)}>{categories.map(item=><option key={item} value={item}>{item}</option>)}</select><label htmlFor="new-category">OR CREATE A CATEGORY</label><input id="new-category" value={newCategory} onChange={event=>setNewCategory(event.target.value)} maxLength={60} placeholder="Leave blank to use the selected category"/><label htmlFor="artwork-description">DESCRIPTION (OPTIONAL)</label><textarea id="artwork-description" value={description} onChange={event=>setDescription(event.target.value)} maxLength={500} rows={3}/><button className="solid-button" type="submit" disabled={busy}>{busy?'UPLOADING...':'UPLOAD ARTWORK'} <Upload size={16}/></button></form></section><section className="admin-section"><h2>Comments awaiting approval <span className="accent">({pending.length})</span></h2>{pending.length===0&&<p className="small-note">No comments are waiting for approval.</p>}{pending.map(comment=><article className="moderation-card" key={comment.id}><p className="eyebrow">{comment.artworkTitle}</p><h3>{comment.name}</h3><p>{comment.message}</p><div><button type="button" className="approve-button" onClick={()=>void moderate(comment.id,'approved')}><Check size={16}/> APPROVE</button><button type="button" className="reject-button" onClick={()=>void moderate(comment.id,'rejected')}><Trash2 size={16}/> REJECT</button></div></article>)}</section><section className="admin-section"><h2>Gallery artworks <span className="accent">({artworks.length})</span></h2><ul className="admin-artwork-list">{artworks.map(art=><li key={art.id}>{art.title}<span>{art.category}</span></li>)}</ul></section></main>;
+  return <main className="inner-page admin-page"><p className="eyebrow">PRIVATE / ARTIST TOOLS</p><h1 className="page-title">Admin<span className="accent">.</span></h1>{status&&<p className="form-status" role="status">{status}</p>}<section className="admin-section"><h2>Upload a drawing</h2><form className="admin-form" onSubmit={upload}><label htmlFor="artwork-file">IMAGE (JPEG, PNG OR WEBP; MAX 15 MB)</label><input id="artwork-file" type="file" accept="image/jpeg,image/png,image/webp" required onChange={event=>{const selected=event.target.files?.[0]||null;setFile(selected);if(selected&&!filename)setFilename(selected.name.replace(/\.[^.]+$/,''))}}/><p className="small-note">A subtle “Karthik” signature is added automatically in the center.</p><label htmlFor="file-name">FILE NAME</label><input id="file-name" value={filename} onChange={event=>setFilename(event.target.value)} required maxLength={80} placeholder="e.g. blue-bird"/><label htmlFor="artwork-title">ARTWORK TITLE</label><input id="artwork-title" value={title} onChange={event=>setTitle(event.target.value)} required maxLength={120} placeholder="The title shown in the gallery"/><label htmlFor="artwork-category">CATEGORY</label><select id="artwork-category" value={category} onChange={event=>setCategory(event.target.value)}>{categories.map(item=><option key={item} value={item}>{item}</option>)}</select><label htmlFor="new-category">OR CREATE A CATEGORY</label><input id="new-category" value={newCategory} onChange={event=>setNewCategory(event.target.value)} maxLength={60} placeholder="Leave blank to use the selected category"/><label htmlFor="artwork-description">DESCRIPTION (OPTIONAL)</label><textarea id="artwork-description" value={description} onChange={event=>setDescription(event.target.value)} maxLength={500} rows={3}/><button className="solid-button" type="submit" disabled={busy}>{busy?'UPLOADING...':'UPLOAD ARTWORK'} <Upload size={16}/></button></form></section><section className="admin-section"><h2>Comments awaiting approval <span className="accent">({pending.length})</span></h2>{pending.length===0&&<p className="small-note">No comments are waiting for approval.</p>}{pending.map(comment=><article className="moderation-card" key={comment.id}><p className="eyebrow">{comment.artworkTitle}</p><h3>{comment.name}</h3><p>{comment.message}</p><div><button type="button" className="approve-button" onClick={()=>void moderate(comment.id,'approved')}><Check size={16}/> APPROVE</button><button type="button" className="reject-button" onClick={()=>void moderate(comment.id,'rejected')}><Trash2 size={16}/> REJECT</button></div></article>)}</section><section className="admin-section"><h2>Gallery artworks <span className="accent">({artworks.length})</span></h2><ul className="admin-artwork-list">{artworks.map(art=><li key={art.id}>{art.title}<span>{art.category}</span></li>)}</ul></section></main>;
 }
 
 function App(){

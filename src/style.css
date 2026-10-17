@@ -26,7 +26,7 @@
 .comment-count:focus-visible{outline:2px solid #a5835e;outline-offset:2px}
 .approved-comments{margin:24px 0 36px}
 .comments-section:target{scroll-margin-top:24px}
-.art-image::after,.detail-image::after,.about-visual::after{content:"Karthik Arun ©";position:absolute;right:18px;bottom:14px;z-index:2;pointer-events:none;color:rgba(255,255,255,.92);font-family:Georgia,serif;font-size:clamp(10px,1vw,14px);font-style:italic;letter-spacing:.03em;text-shadow:0 1px 3px rgba(0,0,0,.8);opacity:.78}
+.art-image::after,.detail-image::after,.about-visual::after{content:"Karthik";position:absolute;left:50%;top:50%;z-index:2;transform:translate(-50%,-50%);pointer-events:none;color:rgba(255,255,255,.56);font-family:Georgia,serif;font-size:clamp(15px,2vw,25px);font-style:italic;letter-spacing:.03em;text-shadow:0 1px 4px rgba(0,0,0,.58);opacity:.58}
 .art-image.watermark-baked::after,.detail-image.watermark-baked::after{display:none}
 .art-view,.detail-zoom-controls{z-index:3}
 .about-visual{position:relative}
